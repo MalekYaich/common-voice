@@ -12,6 +12,8 @@ LABEL tag=$TAG
 EXPOSE 9000
 
 # Install dependencies
+RUN mkdir /.cache && chmod -R 777 /.cache
+
 RUN apt-get update && \
     apt-get install -y apt-transport-https build-essential cmake && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
