@@ -123,6 +123,18 @@ export const menuItems: Record<NavItem, MenuConfig> = {
     menuTooltip: 'about-menu-tooltip',
     menuAriaLabel: 'about-menu-aria-label',
   },
-
+  alsacien: {
+    items: [
+      {
+        icon: Globe,  // Exemple d'icône
+        localizedId: 'alsacien-item',
+        menuItemTooltip: 'alsacien-menu-item-tooltip',
+        menuItemAriaLabel: 'alsacien-menu-item-aria-label',
+        internalHref: URLS.ALSACIEN, // Lien interne ou autre
+      },
+    ],
+    menuTooltip: 'alsacien-contribute-menu-tooltip',
+    menuAriaLabel: 'alsacien-contribute-menu-aria-label',
+  }
 
 }

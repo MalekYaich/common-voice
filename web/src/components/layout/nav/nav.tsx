@@ -23,7 +23,13 @@ type NavProps = {
   children?: React.ReactNode
 }
 
-export type NavItem = 'speak' | 'listen' | 'write' | 'about' | 'download'
+export type NavItem =
+  | 'speak'
+  | 'listen'
+  | 'write'
+  | 'about'
+  | 'download'
+  | 'alsacien'
 
 export const LocalizedNavLink = ({ id, to }: { id: string; to: string }) => {
   const [locale] = useLocale()

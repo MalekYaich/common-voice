@@ -1,11 +1,11 @@
-import classNames from 'classnames';
-import * as React from 'react';
+import classNames from 'classnames'
+import * as React from 'react'
 
-import './page-heading.css';
+import './page-heading.css'
 
 interface Props {
-  children: React.ReactNode;
-  isLight?: boolean;
+  children: React.ReactNode
+  isLight?: boolean
 }
 const PageHeading = ({ children, isLight = false }: Props) => {
   return (
@@ -15,7 +15,7 @@ const PageHeading = ({ children, isLight = false }: Props) => {
       })}>
       {children}
     </h1>
-  );
-};
+  )
+}
 
-export default PageHeading;
+export default PageHeading

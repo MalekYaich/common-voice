@@ -35,11 +35,16 @@ import LanguagesProvider from './languages-provider'
 import ErrorBoundary from './error-boundary/error-boundary'
 import LocalizedErrorBoundary from './error-boundary/localized-error-boundary'
 import { AB_TESTING_SPLIT_KEY, SPLIT_A, SPLIT_B } from '../constants'
+//import alsacienPage from './pages/contribution/alsacien/speak'
 
 const ListenPage = React.lazy(
   () => import('./pages/contribution/listen/listen')
 )
 const SpeakPage = React.lazy(() => import('./pages/contribution/speak/speak'))
+const alsacienPage = React.lazy(
+  () => import('./pages/contribution/alsacien/alsacien')
+)
+
 const WritePage = React.lazy(
   () => import('./pages/contribution/sentence-collector/write/write-container')
 )

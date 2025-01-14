@@ -11,6 +11,7 @@ export default Object.freeze({
   LISTEN: '/listen',
   WRITE: '/write',
   REVIEW: '/review',
+  ALSACIEN:'/alsacien',
 
   PROFILE,
   PROFILE_INFO: PROFILE + '/info',
@@ -52,6 +53,7 @@ export default Object.freeze({
   DEMO_LISTEN: DEMO + '/listen',
   DEMO_ACCOUNT: DEMO + '/create-profile',
   DEMO_CONTRIBUTE: DEMO + '/contribute',
+
   TARGET_SEGMENT_INFO:
     'https://discourse.mozilla.org/t/help-create-common-voices-first-target-segment/59587',
   TARGET_SEGMENT_INFO_ES:

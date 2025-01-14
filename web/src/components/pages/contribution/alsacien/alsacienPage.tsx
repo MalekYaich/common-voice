@@ -6,39 +6,41 @@ import {
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Tooltip } from 'react-tippy'
-import { Flags } from '../../../stores/flags'
-import { Locale } from '../../../stores/locale'
-import StateTree from '../../../stores/tree'
-import { User } from '../../../stores/user'
+import { Flags } from '../../../../stores/flags'
+import { Locale } from '../../../../stores/locale'
+import StateTree from '../../../../stores/tree'
+import { User } from '../../../../stores/user'
 import { Sentence } from 'common'
 import {
   trackListening,
   trackRecording,
   getTrackClass,
-} from '../../../services/tracker'
-import URLS from '../../../urls'
-import { LocaleLink, LocaleNavLink } from '../../locale-helpers'
-import Modal from '../../modal/modal'
+} from '../../../../services/tracker'
+import URLS from '../../../../urls'
+import { LocaleLink, LocaleNavLink } from '../../../locale-helpers'
+import Modal from '../../../modal/modal'
 import {
   KeyboardIcon,
   SkipIcon,
   ExternalLinkIcon,
   ArrowLeft,
   QuestionIcon,
-} from '../../ui/icons'
-import { Tag } from './tag'
-import { Button, StyledLink, LabeledCheckbox, LinkButton } from '../../ui/ui'
-import { PrimaryButton } from '../../primary-buttons/primary-buttons'
-import ShareModal from '../../share-modal/share-modal'
-import { ReportButton, ReportModal, ReportModalProps } from './report/report'
-import Wave from './wave'
-import { FirstPostSubmissionCta } from './speak/firstSubmissionCTA/firstPostSubmissionCTA'
-import { Notifications } from '../../../stores/notifications'
+} from '../../../ui/icons'
+//import React, { useState, Component, useRef } from 'react'
 
-import { SecondPostSubmissionCTA } from './speak/secondSubmissionCTA/secondSubmissionCTA'
-import Success from './success'
+import { Tag } from '../tag'
+import { Button, StyledLink, LabeledCheckbox, LinkButton } from '../../../ui/ui'
+import { PrimaryButton } from '../../../primary-buttons/primary-buttons'
+import ShareModal from '../../../share-modal/share-modal'
+import { ReportButton, ReportModal, ReportModalProps } from '../report/report'
+import Wave from '../wave'
+import { FirstPostSubmissionCta } from '../speak/firstSubmissionCTA/firstPostSubmissionCTA'
+import { Notifications } from '../../../../stores/notifications'
 
-import './contribution.css'
+import { SecondPostSubmissionCTA } from '../speak/secondSubmissionCTA/secondSubmissionCTA'
+import Success from '../success'
+
+import './alsacienPage.css'
 
 export const SET_COUNT = 5
 
@@ -65,7 +67,6 @@ export interface ContributionPageProps
   extends WithLocalizationProps,
     PropsFromState,
     PropsFromDispatch {
-  demoMode: boolean
   activeIndex: number
   hasErrors: boolean
   errorContent?: React.ReactNode
@@ -76,9 +77,11 @@ export interface ContributionPageProps
   }) => React.ReactNode
   isFirstSubmit?: boolean
   isPlaying: boolean
-  isSubmitted: boolean
+  isSubmitted?: boolean
+  isClicked?: boolean
   onReset: () => any
-  onSkip: () => any
+  onSkip?: () => any
+  onNext?: () => any
   onSubmit?: (evt?: React.SyntheticEvent) => void
   onPrivacyAgreedChange?: (privacyAgreed: boolean) => void
   privacyAgreedChecked?: boolean
@@ -93,7 +96,8 @@ export interface ContributionPageProps
     icon?: React.ReactNode
     action: () => any
   }[]
-  type: 'speak' | 'listen'
+  type: 'speak' | 'listen' | 'variant'
+  userVariant?: string
 }
 
 interface State {
@@ -237,15 +241,11 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       shouldShowFirstCTA,
       shouldShowSecondCTA,
       user,
-      demoMode,
     } = this.props
     const { showReportModal, showShareModal, showShortcutsModal } = this.state
 
     return (
-      <div
-        className="contribution-wrapper"
-        data-testid="contribution-page"
-        onClick={() => this.selectPill(null)}>
+      <div className="contribution-wrapper" data-testid="contribution-page">
         {showShareModal && (
           <ShareModal onRequestClose={this.toggleShareModal} />
         )}
@@ -275,45 +275,8 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             {...reportModalProps}
           />
         )}
-        <div
-          className={[
-            'contribution',
-            type,
-            this.isDone ? 'submittable' : '',
-            shouldShowFirstCTA ? 'first-cta-visible' : '',
-            shouldShowSecondCTA ? 'second-cta-visible' : '',
-          ].join(' ')}>
+        <div className={['contribution', type].join(' ')}>
           <div className="top">
-            {demoMode && (
-              <LocaleLink
-                to={
-                  user.account && !demoMode
-                    ? URLS.DASHBOARD
-                    : demoMode
-                    ? URLS.DEMO_CONTRIBUTE
-                    : URLS.ROOT
-                }
-                className="back">
-                <ArrowLeft />
-              </LocaleLink>
-            )}
-
-            {demoMode && (
-              <div className="links">
-                <Localized id="speak">
-                  <LocaleNavLink
-                    className={getTrackClass('fs', `toggle-speak`)}
-                    to={URLS.DEMO_SPEAK}
-                  />
-                </Localized>
-                <Localized id="listen">
-                  <LocaleNavLink
-                    className={getTrackClass('fs', `toggle-listen`)}
-                    to={URLS.DEMO_LISTEN}
-                  />
-                </Localized>
-              </div>
-            )}
             <div className="mobile-break" />
           </div>
           {this.renderContent()}
@@ -339,6 +302,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       isSubmitted,
       onReset,
       onSkip,
+      onNext,
       onSubmit,
       pills,
       primaryButtons,
@@ -349,13 +313,15 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       shouldShowFirstCTA,
       shouldShowSecondCTA,
       user,
+      isClicked,
+      userVariant,
     } = this.props
     const { selectedPill } = this.state
 
     const noUserAccount = !user.account
 
-    if (isSubmitted && type === 'listen' && noUserAccount) {
-      return <Success onReset={onReset} type={type} />
+    if (isSubmitted && noUserAccount) {
+      return <Success onReset={onReset} type={type} userVariant={userVariant} />
     }
 
     const shouldShowCTA = shouldShowFirstCTA || shouldShowSecondCTA
@@ -394,70 +360,51 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
                 ),
               }) || <div className="instruction hidden-sm-down" />}
 
-              <div className="cards">
-                {sentences.map((sentence, i) => {
-                  const activeSentenceIndex = this.isDone
-                    ? SET_COUNT - 1
-                    : activeIndex
-                  const isActive = i === activeSentenceIndex
-                  return (
-                    <div
-                      // don't let Chrome auto-translate
-                      // https://html.spec.whatwg.org/multipage/dom.html#the-translate-attribute
-                      translate="no"
-                      key={sentence ? sentence.text : i}
-                      className={
-                        'card card-dimensions ' + (isActive ? '' : 'inactive')
-                      }
-                      style={{
-                        transform: [
-                          `scale(${isActive ? 1 : 0.9})`,
-                          `translateX(${
-                            (document.dir == 'rtl' ? -1 : 1) *
-                            (i - activeSentenceIndex) *
-                            -130
-                          }%)`,
-                        ].join(' '),
-                        opacity: i < activeSentenceIndex ? 0 : 1,
-                      }}
-                      data-testid={`card-${i + 1}`}>
+              <div className="cards-container">
+                <div className="cards">
+                  {sentences.map((sentence, i) => {
+                    const activeSentenceIndex = this.isDone
+                      ? SET_COUNT - 1
+                      : activeIndex
+                    const isActive = i === activeSentenceIndex
+                    return (
                       <div
+                        translate="no"
+                        key={sentence ? sentence.text : i}
+                        className={
+                          'card card-dimensions ' + (isActive ? '' : 'inactive')
+                        }
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'space-evenly',
-                        }}>
-                        {sentence?.text}
-                        {sentence?.taxonomy ? (
-                          <div className="sentence-taxonomy">
-                            <Localized id="target-segment-generic-card">
-                              <span className="taxonomy-message" />
-                            </Localized>
-                            <StyledLink
-                              className="taxonomy-link"
-                              blank
-                              href={`${URLS.GITHUB_ROOT}/blob/main/docs/taxonomies/${sentence.taxonomy.source}.md`}>
-                              <ExternalLinkIcon />
-                              <Localized id="target-segment-learn-more">
-                                <span />
-                              </Localized>
-                            </StyledLink>
-                          </div>
-                        ) : null}
-                        {sentence?.variant && (
-                          <Tag text={getString(sentence.variant.tag)} />
-                        )}
+                          transform: [
+                            `scale(${isActive ? 1 : 0.9})`,
+                            `translateX(${
+                              (document.dir == 'rtl' ? -1 : 1) *
+                              (i - activeSentenceIndex) *
+                              -130
+                            }%)`,
+                          ].join(' '),
+                          opacity: i < activeSentenceIndex ? 0 : 1,
+                        }}
+                        data-testid={`card-${i + 1}`}>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'space-evenly',
+                          }}>
+                          {sentence?.text}
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
+                <div className="primary-buttons">{primaryButtons}</div>
               </div>
             </div>
           )}
-
           {shouldShowCTA ? (
             <div />
           ) : (
@@ -491,30 +438,10 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             </div>
           )}
         </div>
-
-        {noUserAccount && shouldShowFirstCTA && (
-          <FirstPostSubmissionCta
-            locale={this.props.locale}
-            onReset={onReset}
-            addNotification={this.props.addNotification}
-            successUploadMessage={getString('thanks-for-voice-toast')}
-            errorUploadMessage={getString('thanks-for-voice-toast-error')}
-          />
-        )}
-
-        {noUserAccount && shouldShowSecondCTA && (
-          <SecondPostSubmissionCTA onReset={onReset} />
-        )}
-
         {instruction({
           vars: { actionType: getString('action-tap') },
           children: <div className="instruction hidden-md-up" />,
         }) || <div className="instruction hidden-md-up" />}
-
-        <div className="primary-buttons">
-          <canvas ref={this.canvasRef} />
-          {primaryButtons}
-        </div>
 
         {!hasErrors && !isSubmitted && (
           <LocaleLink
@@ -555,22 +482,19 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             </div>
           </div>
           <div>
-            <Button
-              rounded
-              outline
-              className={[
-                'skip',
-                getTrackClass('fs', `skip-${type}`),
-                'fs-ignore-rage-clicks',
-              ].join(' ')}
-              disabled={!this.isLoaded}
-              onClick={onSkip}
-              data-testid="skip-button">
-              <SkipIcon />
-              <Localized id="skip">
-                <span />
-              </Localized>{' '}
-            </Button>
+            <Localized id="next-button">
+              <PrimaryButton
+                className={[
+                  'submit',
+                  getTrackClass('fs', `submit-${type}`),
+                ].join(' ')}
+                disabled={!isClicked}
+                onClick={onNext}
+                type="submit"
+                data-testid="submit-button"
+              />
+            </Localized>
+
             {onSubmit && shouldHideCTA && (
               <form
                 onSubmit={onSubmit}

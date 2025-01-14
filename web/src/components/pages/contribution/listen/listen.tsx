@@ -1,14 +1,14 @@
-import { Localized } from '@fluent/react';
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter } from 'react-router';
-import NavigationPrompt from 'react-router-navigation-prompt';
+import { Localized } from '@fluent/react'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
+import NavigationPrompt from 'react-router-navigation-prompt'
 
-import { Clip as ClipType } from 'common';
-import { trackListening, getTrackClass } from '../../../../services/tracker';
-import { Clips } from '../../../../stores/clips';
-import { Locale } from '../../../../stores/locale';
-import { User } from '../../../../stores/user';
+import { Clip as ClipType } from 'common'
+import { trackListening, getTrackClass } from '../../../../services/tracker'
+import { Clips } from '../../../../stores/clips'
+import { Locale } from '../../../../stores/locale'
+import { User } from '../../../../stores/user'
 import {
   AbortContributionModalActions,
   AbortContributionModalStatus,
@@ -58,16 +58,16 @@ export const VoteButton = ({
 )
 
 interface PropsFromState {
-  api: API;
-  clips: ClipType[];
-  isLoading: boolean;
-  hasLoadingError: boolean;
-  locale: Locale.State;
-  user: User.State;
-  showFirstContributionToast: boolean;
-  hasEarnedSessionToast: boolean;
-  showFirstStreakToast: boolean;
-  challengeEnded: boolean;
+  api: API
+  clips: ClipType[]
+  isLoading: boolean
+  hasLoadingError: boolean
+  locale: Locale.State
+  user: User.State
+  showFirstContributionToast: boolean
+  hasEarnedSessionToast: boolean
+  showFirstStreakToast: boolean
+  challengeEnded: boolean
 }
 
 interface PropsFromDispatch {
@@ -108,8 +108,9 @@ class ListenPage extends React.Component<Props, State> {
   demoMode = this.props.location.pathname.includes(URLS.DEMO)
 
   static getDerivedStateFromProps(props: Props, state: State) {
-
-    const unvalidatedClips = state.clips.filter(clip => clip.isValid === null).length;
+    const unvalidatedClips = state.clips.filter(
+      clip => clip.isValid === null
+    ).length
 
     if (unvalidatedClips > 0) return null
 
@@ -300,17 +301,17 @@ class ListenPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { isLoading, hasLoadingError, user, locale } = this.props;
+    const { isLoading, hasLoadingError, user, locale } = this.props
     const { clips, hasPlayed, hasPlayedSome, isPlaying, isSubmitted } =
-      this.state;
-    const clipIndex = this.getClipIndex();
+      this.state
+    const clipIndex = this.getClipIndex()
     const activeClip = clipIndex >= 0 ? clips[clipIndex] : null
-    const noClips = clips.length === 0;
-    const isMissingClips = !isLoading && (noClips || !activeClip);
+    const noClips = clips.length === 0
+    const isMissingClips = !isLoading && (noClips || !activeClip)
     const currentLocale = user?.account?.languages.find(
       lang => lang.locale === locale
-    );
-    const isVariantPreferredOption = currentLocale?.variant?.is_preferred_option;
+    )
+    const isVariantPreferredOption = currentLocale?.variant?.is_preferred_option
 
     return (
       <>
@@ -510,8 +511,8 @@ const mapStateToProps = (state: StateTree) => {
     api,
     locale: state.locale,
     user: state.user,
-  };
-};
+  }
+}
 
 const mapDispatchToProps = {
   loadClips: Clips.actions.refillCache,

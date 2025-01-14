@@ -9,6 +9,8 @@ const SOURCES = {
     'https://tagmanager.google.com',
     // we allow unsafe-inline for fundraise up styles - https://fundraiseup.com/support/content-security-policy/
     "'unsafe-inline'",
+    'https://drive.google.com',  // Ajouter Google Drive ici pour les fichiers média
+
   ],
   'img-src': [
     "'self'",
@@ -35,6 +37,8 @@ const SOURCES = {
     'https://*.amazonaws.com',
     'https://*.amazon.com',
     'https://*.googleapis.com',
+    'https://*drive.google.com',  // Ajouter Google Drive ici pour les fichiers média
+
   ],
   'script-src': [
     "'self'",

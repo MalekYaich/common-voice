@@ -26,6 +26,13 @@
         }
     }
 
+    & .user-variant {
+        display: inline-block;
+        position: relative;
+        text-align: end;
+        color: var(--valid-green);
+      }
+
     & .goal-percentage {
         display: inline-block;
         position: relative;
@@ -175,7 +182,9 @@
         margin-bottom: 10px;
         font-weight: normal;
         font-size: var(--font-size-xl);
+        
     }
+    
 
     & h2 {
         font-family: var(--base-font-family);
@@ -198,4 +207,6 @@
             transform: translateX(-50%);
         }
     }
+
 }
+
